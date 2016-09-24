@@ -21,6 +21,8 @@ Install() // install minitouch
 Start() //start minitouch service
 
 Click(x, y) //tap position (x, y)
+
+Swipe(sx, sy, ex, ey) //swipe from (sx,sy) to (ex,ey)
 ```
 
 For more information, please refer to the [demo](/demo/main.go)

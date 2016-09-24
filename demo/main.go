@@ -26,9 +26,13 @@ func test() {
 	}
 
 	// //click
-	m.Click(120, 800)
-	time.Sleep(5 * time.Second)
-	// //m.Close()
+	//m.Click(120, 800)
+	time.Sleep(3 * time.Second)
+
+	// swipe
+	m.Swipe(100, 700, 700, 700)
+	time.Sleep(3 * time.Second)
+	m.Close()
 }
 
 func main() {

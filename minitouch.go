@@ -243,14 +243,11 @@ func (s *Service) sendMinitouch() (err error) {
 			} else if cmd[len(cmd)-1] != '\n' {
 				cmd += "\n"
 			}
-			log.Println(cmd)
-			log.Println([]byte(cmd))
 			_, err := conn.Write([]byte(cmd))
 			if err != nil {
 				log.Fatal(err)
 				s.restartC <- true
 			}
-			conn.Close()
 		}
 		conn.Close()
 	}()
@@ -287,13 +284,17 @@ func (s *Service) Click(x, y int) {
 /*
 Swipe from (sx, sy) to (ex, ey)
 */
-/*
+
 func (s *Service) Swipe(sx, sy, ex, ey int) {
-	step := 20
+	step := 10
 	dx := (ex - sx) / step
 	dy := (ey - sy) / step
 	s.cmdC <- fmt.Sprintf("d 0 %d %d 50\nc\n", sx, sy)
+	for i := 0; i < step; i++ {
+		x, y := sx+i*dx, sy+i*dy
+		s.cmdC <- fmt.Sprintf("m 0 %d %d 50\nc\n", x, y)
+	}
+	s.cmdC <- fmt.Sprintf("u 0 %d %d 50\nc\nu 0\nc\n", ex, ey)
 	return
 
 }
-*/
