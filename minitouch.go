@@ -319,7 +319,6 @@ func (s *Service) Operation(action string, index, posX, posY int) {
 		s.cmdC <- fmt.Sprintf("d %v %v %v 50\nc\n", index, posX, posY)
 	case "m":
 		s.cmdC <- fmt.Sprintf("m %v %v %v 50\nc\n", index, posX, posY)
-
 	case "u":
 		s.cmdC <- fmt.Sprintf("u %v %v %v 50\nc\nu %v\nc\n", index, posX, posY, index)
 

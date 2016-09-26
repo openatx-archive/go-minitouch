@@ -1,0 +1,76 @@
+<!doctype html>
+<canvas id="canvas" style="border: 1px solid red;"></canvas>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js" type="text/javascript"></script>
+<script>
+/*jshint browser:true*/
+
+var BLANK_IMG =
+  'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+
+var canvas = document.getElementById('canvas')
+  , g = canvas.getContext('2d')
+
+var isDown = false;
+
+var ws = new WebSocket('ws://'+location.host+'/ws')
+ws.binaryType = 'blob'
+
+ws.onclose = function() {
+  console.log('onclose', arguments)
+}
+
+ws.onerror = function() {
+  console.log('onerror', arguments)
+}
+
+ws.onmessage = function(message) {
+  var blob = new Blob([message.data], {type: 'image/jpeg'})
+  var URL = window.URL || window.webkitURL
+  var img = new Image()
+  img.onload = function() {
+    console.log(img.width, img.height)
+    canvas.width = img.width
+    canvas.height = img.height
+    g.drawImage(img, 0, 0)
+    img.onload = null
+    img.src = BLANK_IMG
+    img = null
+    u = null
+    blob = null
+  }
+  var u = URL.createObjectURL(blob)
+  img.src = u
+}
+
+ws.onopen = function() {
+  console.log('onopen', arguments)
+  ws.send('1920x1080/0')
+}
+
+
+$("#canvas").mousedown(function (event) {
+  var posX = event.clientX - canvas.offsetLeft;
+  var posY = event.clientY - canvas.offsetTop;
+  var index = 0;
+  ws.send("d " + index + " " + posX + " " + posY);
+  isDown = true;
+});
+
+$("#canvas").mouseup(function (event) {  
+  var posX = event.clientX - canvas.offsetLeft;
+  var posY = event.clientY - canvas.offsetTop;
+  var index = 0;
+  ws.send("u " + index + " " + posX + " " + posY);
+  isDown = false;
+});
+
+$("#canvas").mousemove(function (event) {
+  if(isDown) {
+    var posX = event.clientX - canvas.offsetLeft;
+    var posY = event.clientY - canvas.offsetTop;
+    var index = 0;
+    ws.send("m " + index + " " + posX + " " + posY);
+  }
+});
+
+</script>
