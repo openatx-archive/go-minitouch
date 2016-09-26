@@ -52,6 +52,7 @@ $("#canvas").mousedown(function (event) {
   var posX = event.clientX - canvas.offsetLeft;
   var posY = event.clientY - canvas.offsetTop;
   var index = 0;
+  console.log("mouse down...", posX, posY);
   ws.send("d " + index + " " + posX + " " + posY);
   isDown = true;
 });

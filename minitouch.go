@@ -36,15 +36,18 @@ type Options struct {
 }
 
 type Service struct {
-	d        AdbDevice
-	proc     *exec.Cmd
-	port     int
-	host     string
-	closed   bool
-	brd      *bufio.Reader
-	mu       sync.Mutex
-	cmdC     chan string
-	restartC chan bool
+	d           AdbDevice
+	proc        *exec.Cmd
+	port        int
+	host        string
+	closed      bool
+	brd         *bufio.Reader
+	mu          sync.Mutex
+	cmdC        chan string
+	restartC    chan bool
+	r           Rotation
+	orientation int
+	dispInfo    DisplayInfo
 }
 
 /*
@@ -97,6 +100,7 @@ func NewService(option Options) (s Service, err error) {
 		return
 	}
 	s.restartC = make(chan bool, 1)
+	s.r, err = newRotationService(option)
 	return
 }
 
@@ -109,6 +113,10 @@ P.s.
 	Install function will download files, so keep network connected.
 */
 func (s *Service) Install() (err error) {
+	err = s.r.install()
+	if err != nil {
+		return
+	}
 	abi, err := s.d.getProp("ro.product.cpu.abi")
 	if err != nil {
 		return
@@ -255,6 +263,22 @@ func (s *Service) sendMinitouch() (err error) {
 }
 
 func (s *Service) Start() (err error) {
+	//rotation watcher
+	err = s.r.start()
+	if err != nil {
+		return
+	}
+	orienC, err := s.r.watch()
+	if err != nil {
+		return
+	}
+
+	go func() {
+		for {
+			s.orientation = <-orienC
+		}
+	}()
+
 	s.sendMinitouch()
 	return
 	if err = s.sendMinitouch(); err != nil {
@@ -272,10 +296,34 @@ func (s *Service) Start() (err error) {
 	return
 }
 
+//handle posx, posy
+func (s *Service) handlePos(oldX, oldY int) (newX, newY int) {
+	if s.dispInfo.Height == 0 {
+		var err error
+		s.dispInfo, err = s.d.getDisplayInfo()
+		if err != nil {
+			return oldX, oldY
+		}
+	}
+	if s.dispInfo.Width > s.dispInfo.Height {
+		s.dispInfo.Width, s.dispInfo.Height = s.dispInfo.Height, s.dispInfo.Width
+	}
+	switch s.orientation {
+	case 0:
+		newX, newY = oldX, oldY
+	case 90:
+		newX, newY = s.dispInfo.Width-oldY, oldX
+	case 270:
+		newX, newY = oldY, s.dispInfo.Height-oldX
+	}
+	return
+}
+
 /*
 Click postiion(x,y)
 */
 func (s *Service) Click(x, y int) {
+	x, y = s.handlePos(x, y)
 	cmd := fmt.Sprintf("d 0 %d %d 50\nc\nu 0\nc\n", x, y)
 	s.cmdC <- cmd
 	return
@@ -286,6 +334,8 @@ Swipe from (sx, sy) to (ex, ey)
 */
 
 func (s *Service) Swipe(sx, sy, ex, ey int) {
+	sx, sy = s.handlePos(sx, sy)
+	ex, ey = s.handlePos(ex, ey)
 	step := 10
 	dx := (ex - sx) / step
 	dy := (ey - sy) / step
@@ -314,6 +364,7 @@ General interface: Operation
 		postion y axis
 */
 func (s *Service) Operation(action string, index, posX, posY int) {
+	posX, posY = s.handlePos(posX, posY)
 	switch action {
 	case "d":
 		s.cmdC <- fmt.Sprintf("d %v %v %v 50\nc\n", index, posX, posY)
