@@ -26,11 +26,21 @@ func test() {
 	}
 
 	// //click
-	//m.Click(120, 800)
-	time.Sleep(3 * time.Second)
+	// m.Click(120, 800)
+	// time.Sleep(3 * time.Second)
 
-	// swipe
-	m.Swipe(100, 700, 700, 700)
+	// Action
+	log.Println("start operating...")
+	m.Operation("d", 0, 100, 500)
+	m.Operation("m", 0, 300, 500)
+	m.Operation("m", 0, 500, 500)
+	m.Operation("m", 0, 650, 500)
+	m.Operation("m", 0, 750, 500)
+	m.Operation("m", 0, 850, 500)
+	m.Operation("m", 0, 950, 500)
+	m.Operation("m", 0, 1050, 500)
+	m.Operation("u", 0, 1050, 500)
+
 	time.Sleep(3 * time.Second)
 	m.Close()
 }

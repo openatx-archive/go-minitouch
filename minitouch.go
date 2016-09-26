@@ -298,3 +298,30 @@ func (s *Service) Swipe(sx, sy, ex, ey int) {
 	return
 
 }
+
+/*
+General interface: Operation
+@Parameters:
+	action:
+		d: down
+		m: move
+		u: up
+	index:
+		input index
+	PosX:
+		postion x axis
+	PosY:
+		postion y axis
+*/
+func (s *Service) Operation(action string, index, posX, posY int) {
+	switch action {
+	case "d":
+		s.cmdC <- fmt.Sprintf("d %v %v %v 50\nc\n", index, posX, posY)
+	case "m":
+		s.cmdC <- fmt.Sprintf("m %v %v %v 50\nc\n", index, posX, posY)
+
+	case "u":
+		s.cmdC <- fmt.Sprintf("u %v %v %v 50\nc\nu %v\nc\n", index, posX, posY, index)
+
+	}
+}
