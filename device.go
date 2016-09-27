@@ -52,6 +52,7 @@ func newAdbDevice(serial, AdbPath string) (d AdbDevice, err error) {
 func (d *AdbDevice) shell(cmds ...string) (out string, err error) {
 	args := []string{"-s", d.Serial, "shell"}
 	cmds = append(cmds, ";", "echo", ":$?")
+	args = append(args, cmds...)
 	output, err := exec.Command(d.AdbPath, args...).Output()
 	if err != nil {
 		return
@@ -168,14 +169,14 @@ func (d *AdbDevice) killProc(psName string) (err error) {
 				break
 			}
 		}
-       /*
-		for idx, val := range strings.Fields(fields[0]) {
-			if val == "NAME" {
-				idxName = idx
-				break
+		/*
+			for idx, val := range strings.Fields(fields[0]) {
+				if val == "NAME" {
+					idxName = idx
+					break
+				}
 			}
-		}
-        */
+		*/
 		for _, val := range fields[1:] {
 			field := strings.Fields(val)
 			if strings.Contains(val, psName) {
