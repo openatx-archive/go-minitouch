@@ -11,10 +11,10 @@ import (
 	"strconv"
 	"strings"
 
-	minicap "github.com/BigWavelet/go-minicap"
-	minitouch "github.com/BigWavelet/go-minitouch"
 	"github.com/gorilla/websocket"
 	"github.com/nfnt/resize"
+	minicap "github.com/openatx/go-minicap"
+	minitouch "github.com/openatx/go-minitouch"
 )
 
 var mt minitouch.Service

@@ -9,7 +9,7 @@ This is a minitouch library written based on golang.
 
 you can fetch the library by
 ```shell
-go get github.com/BigWavelet/go-minitouch
+go get github.com/openatx/go-minitouch
 ```
 
 ## Main Interface
