@@ -50,10 +50,8 @@ func newAdbDevice(serial, AdbPath string) (d AdbDevice, err error) {
 }
 
 func (d *AdbDevice) shell(cmds ...string) (out string, err error) {
-	args := []string{}
-	args = append(args, "-s", d.Serial, "shell")
-	args = append(args, cmds...)
-	args = append(args, ";echo :$?")
+	args := []string{"-s", d.Serial, "shell"}
+	cmds = append(cmds, ";", "echo", ":$?")
 	output, err := exec.Command(d.AdbPath, args...).Output()
 	if err != nil {
 		return
