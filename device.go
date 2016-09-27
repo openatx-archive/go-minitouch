@@ -161,22 +161,24 @@ func (d *AdbDevice) killProc(psName string) (err error) {
 	}
 	fields := strings.Split(strip(out), "\n")
 	if len(fields) > 1 {
-		var idxPs, idxName int
+		var idxPs int
 		for idx, val := range strings.Fields(fields[0]) {
 			if val == "PID" {
 				idxPs = idx
 				break
 			}
 		}
+       /*
 		for idx, val := range strings.Fields(fields[0]) {
 			if val == "NAME" {
 				idxName = idx
 				break
 			}
 		}
+        */
 		for _, val := range fields[1:] {
 			field := strings.Fields(val)
-			if strings.Contains(field[idxName+1], psName) {
+			if strings.Contains(val, psName) {
 				pid := field[idxPs]
 				_, err := d.shell("kill", "-9", pid)
 				if err != nil {
