@@ -1,7 +1,7 @@
 
 [![GoDoc](https://godoc.org/github.com/BigWavelet/go-minitouch?status.svg)](https://godoc.org/github.com/BigWavelet/go-minitouch)
 
-This is a minitouch library written based on golang.
+This is a [minitouch](https://github.com/openatx/go-minitouch) library written based on golang.
 
 
 
